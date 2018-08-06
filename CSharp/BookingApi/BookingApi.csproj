@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Interpreter.Net.0.2.5\build\Interpreter.Net.props" Condition="Exists('..\packages\Interpreter.Net.0.2.5\build\Interpreter.Net.props')" />
   <Import Project="..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.props" Condition="Exists('..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -64,8 +65,8 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.props'))" />
-    <Error Condition="!Exists('..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.targets'))" />
+    <Error Condition="!Exists('..\packages\Interpreter.Net.0.2.5\build\Interpreter.Net.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Interpreter.Net.0.2.5\build\Interpreter.Net.props'))" />
+    <Error Condition="!Exists('..\packages\Interpreter.Net.0.2.5\build\Interpreter.Net.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Interpreter.Net.0.2.5\build\Interpreter.Net.targets'))" />
   </Target>
-  <Import Project="..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.targets" Condition="Exists('..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.targets')" />
+  <Import Project="..\packages\Interpreter.Net.0.2.5\build\Interpreter.Net.targets" Condition="Exists('..\packages\Interpreter.Net.0.2.5\build\Interpreter.Net.targets')" />
 </Project>
