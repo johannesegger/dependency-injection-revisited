@@ -1,49 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ploeh.Samples.BookingApi.Sql
 {
-    public class SqlReservationsProgramVisitor<T> :
-        IReservationsProgramVisitor<T, T>,
-        IReservationsInstructionVisitor<IReservationsProgram<T>, T>
+    public class SqlReservationsProgramHandler : IReservationInstructionHandler
     {
         private readonly string connectionString;
 
-        public SqlReservationsProgramVisitor(string connectionString)
+        public SqlReservationsProgramHandler(string connectionString)
         {
             this.connectionString = connectionString;
         }
 
-        public T VisitPure(T x)
+        public Task Handle(IsReservationInFuture instruction)
         {
-            return x;
+            var isInFuture = DateTimeOffset.Now < instruction.Reservation.Date;
+            instruction.SetResult(isInFuture);
+            return Task.CompletedTask;
         }
 
-        public T VisitFree(IReservationsInstruction<IReservationsProgram<T>> i)
-        {
-            return i.Accept(this);
-        }
-
-        public T VisitIsReservationInFuture(
-            Reservation reservation,
-            Func<bool, IReservationsProgram<T>> continuation)
-        {
-            var isInFuture = DateTimeOffset.Now < reservation.Date;
-            return continuation(isInFuture).Accept(this);
-        }
-
-        public T VisitReadReservations(
-            DateTimeOffset date,
-            Func<IReadOnlyCollection<Reservation>, IReservationsProgram<T>> continuation)
+        public Task Handle(ReadReservations instruction)
         {
             var reservations = ReadReservations(
-                date.Date,
-                date.Date.AddDays(1).AddTicks(-1));
-            return continuation(reservations).Accept(this);
+                instruction.Date.Date,
+                instruction.Date.Date.AddDays(1).AddTicks(-1));
+            instruction.SetResult(reservations);
+            return Task.CompletedTask;
         }
 
         private IReadOnlyCollection<Reservation> ReadReservations(
@@ -86,11 +70,10 @@ namespace Ploeh.Samples.BookingApi.Sql
             AND MONTH([Date]) <= MONTH(@MaxDate)
             AND DAY([Date]) <= DAY(@MaxDate)";
 
-        public T VisitCreate(
-            Reservation reservation,
-            Func<int, IReservationsProgram<T>> continuation)
+        public Task Handle(CreateReservation instruction)
         {
-            return continuation(Create(reservation)).Accept(this);
+            instruction.SetResult(Create(instruction.Reservation));
+            return Task.CompletedTask;
         }
 
         private int Create(Reservation reservation)

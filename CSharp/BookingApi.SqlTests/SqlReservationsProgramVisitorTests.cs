@@ -1,10 +1,7 @@
 ﻿using Ploeh.Samples.BookingApi.Sql;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Ploeh.Samples.BookingApi.SqlTests
@@ -26,7 +23,7 @@ namespace Ploeh.Samples.BookingApi.SqlTests
                 Quantity = 2
             };
             var p = maîtreD.TryAccept(reservation);
-            var id = p.Accept(new SqlReservationsProgramVisitor<int?>(connectionString));
+            var id = p.Run(new SqlReservationsProgramHandler(connectionString)).Result;
 
             Assert.NotNull(id);
             Assert.NotEqual(default(int), id);
@@ -36,8 +33,7 @@ namespace Ploeh.Samples.BookingApi.SqlTests
         public void IsReservationInFutureReturnsTrue()
         {
             var now = DateTimeOffset.Now;
-            var sut = new SqlReservationsProgramVisitor<bool>(
-                ConnectionStrings.Reservations);
+            var sut = new SqlReservationsProgramHandler(ConnectionStrings.Reservations);
 
             var reservation = new Reservation
             {
@@ -46,8 +42,9 @@ namespace Ploeh.Samples.BookingApi.SqlTests
                 Email = "sgryt@example.org",
                 Quantity = 2
             };
-            var p = ReservationsProgram.IsReservationInFuture(reservation);
-            var actual = p.Accept(sut);
+            var p = ReservationInstruction.IsReservationInFuture(reservation);
+            p.Accept(sut).Wait();
+            var actual = p.GetResult();
 
             Assert.True(actual);
         }
@@ -56,8 +53,7 @@ namespace Ploeh.Samples.BookingApi.SqlTests
         public void IsReservationInFutureReturnsFalse()
         {
             var now = DateTimeOffset.Now;
-            var sut = new SqlReservationsProgramVisitor<bool>(
-                ConnectionStrings.Reservations);
+            var sut = new SqlReservationsProgramHandler(ConnectionStrings.Reservations);
 
             var reservation = new Reservation
             {
@@ -66,8 +62,9 @@ namespace Ploeh.Samples.BookingApi.SqlTests
                 Email = "qux@example.com",
                 Quantity = 1
             };
-            var p = ReservationsProgram.IsReservationInFuture(reservation);
-            var actual = p.Accept(sut);
+            var p = ReservationInstruction.IsReservationInFuture(reservation);
+            p.Accept(sut).Wait();
+            var actual = p.GetResult();
 
             Assert.False(actual);
         }
@@ -84,14 +81,14 @@ namespace Ploeh.Samples.BookingApi.SqlTests
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
-            var sut = new SqlReservationsProgramVisitor<IReadOnlyCollection<Reservation>>(
-                ConnectionStrings.Reservations);
+            var sut = new SqlReservationsProgramHandler(ConnectionStrings.Reservations);
 
-            var p = ReservationsProgram.ReadReservations(
+            var p = ReservationInstruction.ReadReservations(
                 new DateTimeOffset(
                     new DateTime(2018, 2, 5),
                     TimeSpan.FromHours(1)));
-            var actual = p.Accept(sut);
+            p.Accept(sut).Wait();
+            var actual = p.GetResult();
 
             Assert.Equal(1, actual.Count);
             Assert.Equal("Ploeh Fnaah", actual.First().Name);
@@ -102,10 +99,9 @@ namespace Ploeh.Samples.BookingApi.SqlTests
         [Fact]
         public void CreateAddsRowToDatabase()
         {
-            var sut = new SqlReservationsProgramVisitor<int>(
-                ConnectionStrings.Reservations);
+            var sut = new SqlReservationsProgramHandler(ConnectionStrings.Reservations);
 
-            var p = ReservationsProgram.Create(
+            var p = ReservationInstruction.CreateReservation(
                 new Reservation
                 {
                     Date = new DateTimeOffset(2018, 2, 4, 16, 38, 51, TimeSpan.FromHours(1)),
@@ -114,7 +110,8 @@ namespace Ploeh.Samples.BookingApi.SqlTests
                     IsAccepted = true,
                     Quantity = 4
                 });
-            var actual = p.Accept(sut);
+            p.Accept(sut).Wait();
+            var actual = p.GetResult();
 
             using (var conn = new SqlConnection(ConnectionStrings.Reservations))
             using (var cmd = new SqlCommand("SELECT * FROM Reservations", conn))

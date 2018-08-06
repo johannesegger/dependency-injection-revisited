@@ -1,10 +1,5 @@
-﻿using AutoFixture.Xunit2;
-using Eff.Core;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Ploeh.Samples.BookingApi.UnitTests
@@ -15,7 +10,7 @@ namespace Ploeh.Samples.BookingApi.UnitTests
         public void TryAcceptReturnsReservationIdInHappyPathScenario(
             Reservation reservation,
             IReadOnlyCollection<Reservation> reservations,
-            MaîtreDEffects sut,
+            MaîtreD sut,
             int excessCapacity,
             int expected)
         {
@@ -37,7 +32,7 @@ namespace Ploeh.Samples.BookingApi.UnitTests
             Reservation reservation,
             IReadOnlyCollection<Reservation> reservations,
             int id,
-            MaîtreDEffects sut)
+            MaîtreD sut)
         {
             reservation.IsAccepted = false;
 
@@ -53,7 +48,7 @@ namespace Ploeh.Samples.BookingApi.UnitTests
             Reservation reservation,
             IReadOnlyCollection<Reservation> reservations,
             int id,
-            MaîtreDEffects sut)
+            MaîtreD sut)
         {
             reservation.IsAccepted = false;
             var reservedSeats = reservations.Sum(r => r.Quantity);

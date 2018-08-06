@@ -1,13 +1,9 @@
-﻿using Eff.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Ploeh.Samples.BookingApi.UnitTests
 {
-    public class StubReservationsHandler : IReservationsInstrHandler
+    public class StubReservationsHandler : IReservationInstructionHandler
     {
 
         private readonly bool isInFuture;
@@ -24,19 +20,22 @@ namespace Ploeh.Samples.BookingApi.UnitTests
             this.id = id;
         }
 
-        public async Task Handle(IsReservationInFuture instr)
+        public Task Handle(IsReservationInFuture instr)
         {
             instr.SetResult(isInFuture);
+            return Task.CompletedTask;
         }
 
-        public async Task Handle(ReadReservations instr)
+        public Task Handle(ReadReservations instr)
         {
             instr.SetResult(reservations);
+            return Task.CompletedTask;
         }
 
-        public async Task Handle(CreateReservation instr)
+        public Task Handle(CreateReservation instr)
         {
             instr.SetResult(id);
+            return Task.CompletedTask;
         }
     }
 }

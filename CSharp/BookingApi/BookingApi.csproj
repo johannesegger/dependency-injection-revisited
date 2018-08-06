@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.props" Condition="Exists('..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,6 +12,8 @@
     <AssemblyName>Ploeh.Samples.BookingApi</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,15 +49,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MaîtreDEffects.cs" />
     <Compile Include="IMaîtreD.cs" />
+    <Compile Include="LoggingReservationInstructionHandler.cs" />
+    <Compile Include="MaîtreD.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reservation.cs" />
-    <Compile Include="ReservationsProgramBuilder.cs" />
-    <Compile Include="ReservationsProgramEffects.cs" />
+    <Compile Include="ReservationInstructions.Interpreter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.props'))" />
+    <Error Condition="!Exists('..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.targets'))" />
+  </Target>
+  <Import Project="..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.targets" Condition="Exists('..\packages\Interpreter.Net.0.2.4\build\Interpreter.Net.targets')" />
 </Project>
