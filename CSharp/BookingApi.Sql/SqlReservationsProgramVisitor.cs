@@ -14,20 +14,18 @@ namespace Ploeh.Samples.BookingApi.Sql
             this.connectionString = connectionString;
         }
 
-        public Task Handle(IsReservationInFuture instruction)
+        public Task<bool> Handle(IsReservationInFuture instruction)
         {
             var isInFuture = DateTimeOffset.Now < instruction.Reservation.Date;
-            instruction.SetResult(isInFuture);
-            return Task.CompletedTask;
+            return Task.FromResult(isInFuture);
         }
 
-        public Task Handle(ReadReservations instruction)
+        public Task<IReadOnlyCollection<Reservation>> Handle(ReadReservations instruction)
         {
             var reservations = ReadReservations(
                 instruction.Date.Date,
                 instruction.Date.Date.AddDays(1).AddTicks(-1));
-            instruction.SetResult(reservations);
-            return Task.CompletedTask;
+            return Task.FromResult(reservations);
         }
 
         private IReadOnlyCollection<Reservation> ReadReservations(
@@ -70,10 +68,9 @@ namespace Ploeh.Samples.BookingApi.Sql
             AND MONTH([Date]) <= MONTH(@MaxDate)
             AND DAY([Date]) <= DAY(@MaxDate)";
 
-        public Task Handle(CreateReservation instruction)
+        public Task<int> Handle(CreateReservation instruction)
         {
-            instruction.SetResult(Create(instruction.Reservation));
-            return Task.CompletedTask;
+            return Task.FromResult(Create(instruction.Reservation));
         }
 
         private int Create(Reservation reservation)
